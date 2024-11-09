@@ -11,16 +11,12 @@ $alpha = [A-Za-z]
 
 @int = $digit+
 @float = $digit+(\.$digit+)
-@id = [$alpha][$alpha | $digit]*
-@literal = \" ($printable # \") \"  
+@id = $alpha [$alpha  $digit]*
+@literal = \"[^\"]*\" 
 
 tokens :-
 
 <0> $white+ ;
-<0> @id {\s -> CID (read s)}
-<0> @literal {\s -> CLITERAL (read s)}
-<0> @float {\s -> CFLOAT (read s)}
-<0> @int {\s -> CINT (read s)}
 <0> "+" {\s -> TADD}  
 <0> "-" {\s -> TSUB}  
 <0> "*" {\s -> TMUL}
@@ -31,6 +27,7 @@ tokens :-
 <0> "&&" {\s -> TAND} 
 <0> "||" {\s-> TOR}
 <0> "!" {\s -> TNOT}
+<0> "=" {\s -> TATRIB}
 <0> "==" {\s -> TEQUAL} 
 <0> ">" {\s -> TGT}
 <0> ">=" {\s -> TGET} 
@@ -48,9 +45,13 @@ tokens :-
 <0> "if" {\s -> TIF}
 <0> "else" {\s -> TELSE}
 <0> "while" {\s -> TWHILE}
-<0> "=" {\s -> TATRIB}
 <0> "print" {\s -> TPRINT}
 <0> "read" {\s -> TREAD}
+
+<0> @id {\s -> CID s}
+<0> @literal {\s -> CLITERAL  s}
+<0> @float {\s -> CFLOAT (read s)}
+<0> @int {\s -> CINT (read s)}
 
 {
 -- As acoes tem tipo :: String -> Token

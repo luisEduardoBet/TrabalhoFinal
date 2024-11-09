@@ -9,58 +9,147 @@ import qualified Lex as L
 %tokentype { Token }
 %error { parseError }
 %token 
-  '+' {ADD}
-  '-' {SUB}
-  '*' {MUL}
-  '/' {DIV}
-  '(' {LPAR}
-  ')' {RPAR}
-  '/=' {DIF} 
-  '&&' {E} 
-  '||' {OU} 
-  '!' {NAO}
-  '==' {IGUAL} 
-  '>=' {MAIORE} 
-  '>' {MAIOR} 
-  '<=' {MENORE} 
-  '<' {MENOR}
+  '+' {TADD}
+  '-' {TSUB}
+  '*' {TMUL}
+  '/' {TDIV}
+  '(' {TLPAR}
+  ')' {TRPAR}
+  '/=' {TDIF} 
+  '&&' {TAND} 
+  '||' {TOR} 
+  '!' {TNOT}
+  '==' {TEQUAL} 
+  '>=' {TGET} 
+  '>' {TGT} 
+  '<=' {TLET} 
+  '<' {TLT}
+  'void' {TVOID}
+  'int'  {TINT}
+  'float' {TFLOAT}
+  'string' {TSTRING}
+  'float' {TFLOAT}
+  '{'  {TLB}
+  '}'  {TRB}
+  ','  {TCOMMA}
+  ';'  {TSEMI}
+  'return' {TRET}
+  'if' {TIF}
+  'else' {TELSE}             
+  'while' {TWHILE}     
+  '='  {TATRIB}
+  'print' {TPRINT}
+  'read' {TREAD}
   
-  Num {NUM $$}
-
+  Int {CINT $$}
+  Float {CFLOAT $$}
+  Literal {CLITERAL $$}     
+  Id   {CID $$}
 
 %%
 
-Inicio : Logica {Left $1} 
-       | Expr {Right $1}
+Programa : ListaFuncoes BlocoPrincipal    {}
+         | BlocoPrincipal                 {}
 
-Logica : Logica '&&' LTermo {$1 && $3}
-       | Logica '||' LTermo {$1 || $3}
-       | LTermo {$1}
+ListaFuncoes : ListaFuncoes Funcao        {}
+             | Funcao                     {}
 
-LTermo : '!' LFator {not $2}
-       | LFator   {$1}
+Funcao : TipoRetorno Id '(' DeclParametros ')' BlocoPrincipal         {}
+       | TipoRetorno Id '(' ')' BlocoPrincipal                        {}
 
-LFator : '(' Logica ')' {$2}
-       | RelExpr  {$1}
+TipoRetorno: Tipo           {}
+           | 'void'         {}
 
-RelExpr : Expr '==' Expr {$1 == $3}
-	| Expr '>=' Expr 	{$1 >= $3}
-	| Expr '>' Expr	{$1 > $3}
-	| Expr '<' Expr 	{$1 < $3}
-	| Expr '<=' Expr	{$1 <= $3}
-	| Expr '/=' Expr 	{$1 /= $3}
+DeclParametros: DeclParametros ',' Parametro     {}
+              | Parametro                        {}
+
+Parametro:  Tipo Id         {}
+
+BlocoPrincipal: '{' Declaracoes ListaCmd '}'     {}
+              | '{' ListaCmd '}'                 {}
+
+Declaracoes: Declaracoes Declaracao       {}
+           | Declaracao                   {}
+
+Declaracao : Tipo ListaId ';'      {}
+
+Tipo: 'int'                 {}
+    | 'string'              {} 
+    | 'float'               {}
+
+ListaId: ListaId ',' Id            {}
+       | Id                        {}
+
+Bloco: '{' ListaCmd '}'            {}
+
+ListaCmd: ListaCmd Comando         {}
+        | Comando                  {}
+
+Comando: CmdSe              {}
+       | CmdEnquanto        {}
+       | CmdAtrib           {}
+       | CmdEscrita         {}
+       | CmdLeitura         {}
+       | CmdProc            {}
+       | Retorno            {}
+
+Retorno: 'return' ExpressaoAritmetica            {}
+       | 'return' Literal ';'                    {}
+       | 'return'                                {}
+
+CmdSe: 'if' '(' ExpressaoLogica ')' Bloco                      {}
+     | 'if  '(' ExpressaoLogica ')' Bloco 'else' Bloco         {} 
+
+CmdEnquanto: 'while' '(' ExpressaoLogica ')' Bloco             {}
+
+CmdAtrib: Id '=' ExpressaoAritmetica ';'         {}
+        | Id '=' Literal ';'                     {}
+
+CmdEscrita: 'print' '(' ExpressaoAritmetica ')' ';'     {}
+          | 'print' '(' Literal ')' ';'                 {}   
+
+CmdLeitura: 'read' '(' Id ')' ';'                {}
+
+ChamadaProc: ChamadaFuncao ';'                   {}
+
+ChamadaFuncao: Id '(' ListaParametros ')'        {}
+             | Id '(' ')'                        {}
+
+ListaParametros: ListaParametros ',' ExpressaoAritmetica       {}
+               | ListaParametros ',' Literal                   {} 
+               | ExpressaoAritmetica                           {} 
+               | Literal                                       {}
 
 
-Expr  : Expr '+' Term       {$1 + $3}
-      | Expr '-' Term       {$1 - $3}
-      | Term                {$1}
+ExpressaoLogicaLogica : ExpressaoLogicaLogica '&&' LTermo      {}
+                      | ExpressaoLogicaLogica '||' LTermo      {}
+                      | LTermo                                 {}
 
-Term  : Term  '*' Factor    {$1 * $3}
-      | Term '/' Factor     {$1 / $3}
-      | Factor              {$1}
+LTermo : '!' LFator         {}
+       | LFator             {}
 
-Factor : Num                {$1}
-       | '(' Expr ')'       {$2}      
+LFator : '(' ExpressaoLogica ')'   {}
+       | ExpressaoRelacional       {}
+
+ExpressaoRelacional : ExpressaoAritmetica '==' ExpressaoAritmetica {}
+                    | ExpressaoAritmetica '>=' ExpressaoAritmetica {}
+                    | ExpressaoAritmetica '>' ExpressaoAritmetica  {}
+                    | ExpressaoAritmetica '<' ExpressaoAritmetica  {}
+                    | ExpressaoAritmetica '<=' ExpressaoAritmetica {}
+                    | ExpressaoAritmetica '/=' ExpressaoAritmetica {}
+
+
+ExpressaoAritmetica: ExpressaoAritmetica '+' Term  {}
+                   | ExpressaoAritmetica '-' Term  {}
+                   | Term {}
+
+Term  : Term  '*' Factor    {}
+      | Term '/' Factor     {}
+      | Factor              {}
+
+Factor : Int                               {}
+       | Float                             {}
+       | '(' ExpressaoAritmetica ')'       {}      
 
 
 {

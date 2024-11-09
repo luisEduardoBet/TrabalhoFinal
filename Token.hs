@@ -2,13 +2,14 @@ module Token where
 
 data Token
   = CFLOAT Double
-  | CLITERAL ByteString
-  | CID ByteString
+  | CLITERAL String
+  | CID String
   | CINT Integer
-  | ADD
-  | SUB
-  | MUL
-  | DIV
+  | TADD
+  | TSUB
+  | TMUL
+  | TDIF
+  | TDIV
   | TLPAR
   | TRPAR
   | TAND
