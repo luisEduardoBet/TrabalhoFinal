@@ -1,6 +1,7 @@
 {
 module Parser where
 
+import System.IO
 import Token
 import qualified Lex as L
 }
@@ -28,7 +29,6 @@ import qualified Lex as L
   'int'  {TINT}
   'float' {TFLOAT}
   'string' {TSTRING}
-  'float' {TFLOAT}
   '{'  {TLB}
   '}'  {TRB}
   ','  {TCOMMA}
@@ -90,7 +90,7 @@ Comando: CmdSe              {}
        | CmdAtrib           {}
        | CmdEscrita         {}
        | CmdLeitura         {}
-       | CmdProc            {}
+       | ChamadaProc        {}
        | Retorno            {}
 
 Retorno: 'return' ExpressaoAritmetica            {}
@@ -98,7 +98,7 @@ Retorno: 'return' ExpressaoAritmetica            {}
        | 'return'                                {}
 
 CmdSe: 'if' '(' ExpressaoLogica ')' Bloco                      {}
-     | 'if  '(' ExpressaoLogica ')' Bloco 'else' Bloco         {} 
+     | 'if'  '(' ExpressaoLogica ')' Bloco 'else' Bloco         {} 
 
 CmdEnquanto: 'while' '(' ExpressaoLogica ')' Bloco             {}
 
@@ -121,9 +121,9 @@ ListaParametros: ListaParametros ',' ExpressaoAritmetica       {}
                | Literal                                       {}
 
 
-ExpressaoLogicaLogica : ExpressaoLogicaLogica '&&' LTermo      {}
-                      | ExpressaoLogicaLogica '||' LTermo      {}
-                      | LTermo                                 {}
+ExpressaoLogica: ExpressaoLogica '&&' LTermo      {}
+               | ExpressaoLogica '||' LTermo      {}
+               | LTermo                                 {}
 
 LTermo : '!' LFator         {}
        | LFator             {}
@@ -156,7 +156,8 @@ Factor : Int                               {}
 parseError :: [Token] -> a
 parseError s = error ("Parse error:" ++ show s)
 
-main = do putStr "Expressão:"
+main = do 
+          putStr "Expressão:"
           s <- getLine
           print (calc (L.alexScanTokens s))
 }

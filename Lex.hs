@@ -5,7 +5,7 @@
 {-# LANGUAGE CPP #-}
 {-# LINE 1 "Lex.x" #-}
 module Lex where
-
+import System.IO    
 import Token
 #include "ghcconfig.h"
 import qualified Data.Array
@@ -9687,5 +9687,9 @@ alexRightContext IBOX(sc) user__ _ _ input__ =
 {-# LINE 56 "Lex.x" #-}
 -- As acoes tem tipo :: String -> Token
 
-testLex = do s <- getLine
-             print (alexScanTokens s)
+testLex = do 
+        handle <- openFile "texto.txt" ReadMode
+        contents <- hGetContents handle
+        let linha = lines (contents)
+        print (map alexScanTokens linha) 
+        hClose handle

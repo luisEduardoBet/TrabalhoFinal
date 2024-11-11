@@ -1,6 +1,6 @@
 {
 module Lex where
-
+import System.IO    
 import Token
 }
 
@@ -56,6 +56,10 @@ tokens :-
 {
 -- As acoes tem tipo :: String -> Token
 
-testLex = do s <- getLine
-             print (alexScanTokens s)
+testLex = do 
+        handle <- openFile "texto.txt" ReadMode
+        contents <- hGetContents handle
+        let linha = lines (contents)
+        print (map alexScanTokens linha) 
+        hClose handle
 }
