@@ -12,7 +12,7 @@ $alpha = [A-Za-z]
 @int = $digit+
 @float = $digit+(\.$digit+)
 @id = $alpha [$alpha  $digit]*
-@literal = \"[^\"]*\" 
+@literal = \"[^ \"]*\" 
 
 tokens :-
 
@@ -59,7 +59,6 @@ tokens :-
 testLex = do 
         handle <- openFile "texto.txt" ReadMode
         contents <- hGetContents handle
-        let linha = lines (contents)
-        print (map alexScanTokens linha) 
+        print (alexScanTokens contents) 
         hClose handle
 }

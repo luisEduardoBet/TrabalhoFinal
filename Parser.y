@@ -93,9 +93,9 @@ Comando: CmdSe              {}
        | ChamadaProc        {}
        | Retorno            {}
 
-Retorno: 'return' ExpressaoAritmetica            {}
+Retorno: 'return' ExpressaoAritmetica ';'        {}
        | 'return' Literal ';'                    {}
-       | 'return'                                {}
+       | 'return' ';'                            {}
 
 CmdSe: 'if' '(' ExpressaoLogica ')' Bloco                      {}
      | 'if'  '(' ExpressaoLogica ')' Bloco 'else' Bloco         {} 
@@ -149,6 +149,7 @@ Term  : Term  '*' Factor    {}
 
 Factor : Int                               {}
        | Float                             {}
+       | Id                                {}
        | '(' ExpressaoAritmetica ')'       {}      
 
 
@@ -156,8 +157,9 @@ Factor : Int                               {}
 parseError :: [Token] -> a
 parseError s = error ("Parse error:" ++ show s)
 
-main = do 
-          putStr "Expressão:"
-          s <- getLine
-          print (calc (L.alexScanTokens s))
+main = do
+       handle <- openFile "texto.txt" ReadMode
+       contents <- hGetContents handle
+       print(calc(L.alexScanTokens contents)) 
+       hClose handle
 }

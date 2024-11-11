@@ -9690,6 +9690,5 @@ alexRightContext IBOX(sc) user__ _ _ input__ =
 testLex = do 
         handle <- openFile "texto.txt" ReadMode
         contents <- hGetContents handle
-        let linha = lines (contents)
-        print (map alexScanTokens linha) 
+        print (alexScanTokens contents) 
         hClose handle
