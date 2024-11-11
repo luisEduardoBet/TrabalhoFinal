@@ -49,6 +49,22 @@ import DataTree
 
 %%
 
+Bloco: '{' ListaCmd '}'           {[$2]}
+
+
+ListaCmd: Comando    {$1}
+
+Comando: CmdSe  {$1}
+       | CmdEscrita {$1}
+
+CmdSe: 'if' '(' ExpressaoLogica ')' Bloco                            {If $3 $5 $5}
+     | 'if'  '(' ExpressaoLogica ')' Bloco  'else'  Bloco            {If $3 $5 $7} 
+
+
+
+CmdEscrita: 'print' '(' ExpressaoAritmetica ')' ';'     {Imp $3} 
+
+
 ExpressaoLogica: ExpressaoLogica '&&' LTermo       {And $1 $3}
                | ExpressaoLogica '||' LTermo       {Or $1 $3}
                | LTermo                                 {$1}
