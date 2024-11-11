@@ -4,6 +4,7 @@ module Parser where
 import System.IO
 import Token
 import qualified Lex as L
+import DataTree
 }
 
 %name calc
@@ -48,109 +49,17 @@ import qualified Lex as L
 
 %%
 
-Programa : ListaFuncoes BlocoPrincipal    {}
-         | BlocoPrincipal                 {}
+ExpressaoAritmetica: ExpressaoAritmetica '+' Term  {Add $1 $3}
+                   | ExpressaoAritmetica '-' Term  {Sub $1 $3}
+                   | Term {$1}
 
-ListaFuncoes : ListaFuncoes Funcao        {}
-             | Funcao                     {}
+Term  : Term  '*' Factor    {Mul $1 $3}
+      | Term '/' Factor     {Div $1 $3}
+      | Factor              {$1}
 
-Funcao : TipoRetorno Id '(' DeclParametros ')' BlocoPrincipal         {}
-       | TipoRetorno Id '(' ')' BlocoPrincipal                        {}
-
-TipoRetorno: Tipo           {}
-           | 'void'         {}
-
-DeclParametros: DeclParametros ',' Parametro     {}
-              | Parametro                        {}
-
-Parametro:  Tipo Id         {}
-
-BlocoPrincipal: '{' Declaracoes ListaCmd '}'     {}
-              | '{' ListaCmd '}'                 {}
-
-Declaracoes: Declaracoes Declaracao       {}
-           | Declaracao                   {}
-
-Declaracao : Tipo ListaId ';'      {}
-
-Tipo: 'int'                 {}
-    | 'string'              {} 
-    | 'float'               {}
-
-ListaId: ListaId ',' Id            {}
-       | Id                        {}
-
-Bloco: '{' ListaCmd '}'            {}
-
-ListaCmd: ListaCmd Comando         {}
-        | Comando                  {}
-
-Comando: CmdSe              {}
-       | CmdEnquanto        {}
-       | CmdAtrib           {}
-       | CmdEscrita         {}
-       | CmdLeitura         {}
-       | ChamadaProc        {}
-       | Retorno            {}
-
-Retorno: 'return' ExpressaoAritmetica ';'        {}
-       | 'return' Literal ';'                    {}
-       | 'return' ';'                            {}
-
-CmdSe: 'if' '(' ExpressaoLogica ')' Bloco                      {}
-     | 'if'  '(' ExpressaoLogica ')' Bloco 'else' Bloco         {} 
-
-CmdEnquanto: 'while' '(' ExpressaoLogica ')' Bloco             {}
-
-CmdAtrib: Id '=' ExpressaoAritmetica ';'         {}
-        | Id '=' Literal ';'                     {}
-
-CmdEscrita: 'print' '(' ExpressaoAritmetica ')' ';'     {}
-          | 'print' '(' Literal ')' ';'                 {}   
-
-CmdLeitura: 'read' '(' Id ')' ';'                {}
-
-ChamadaProc: ChamadaFuncao ';'                   {}
-
-ChamadaFuncao: Id '(' ListaParametros ')'        {}
-             | Id '(' ')'                        {}
-
-ListaParametros: ListaParametros ',' ExpressaoAritmetica       {}
-               | ListaParametros ',' Literal                   {} 
-               | ExpressaoAritmetica                           {} 
-               | Literal                                       {}
-
-
-ExpressaoLogica: ExpressaoLogica '&&' LTermo      {}
-               | ExpressaoLogica '||' LTermo      {}
-               | LTermo                                 {}
-
-LTermo : '!' LFator         {}
-       | LFator             {}
-
-LFator : '(' ExpressaoLogica ')'   {}
-       | ExpressaoRelacional       {}
-
-ExpressaoRelacional : ExpressaoAritmetica '==' ExpressaoAritmetica {}
-                    | ExpressaoAritmetica '>=' ExpressaoAritmetica {}
-                    | ExpressaoAritmetica '>' ExpressaoAritmetica  {}
-                    | ExpressaoAritmetica '<' ExpressaoAritmetica  {}
-                    | ExpressaoAritmetica '<=' ExpressaoAritmetica {}
-                    | ExpressaoAritmetica '/=' ExpressaoAritmetica {}
-
-
-ExpressaoAritmetica: ExpressaoAritmetica '+' Term  {}
-                   | ExpressaoAritmetica '-' Term  {}
-                   | Term {}
-
-Term  : Term  '*' Factor    {}
-      | Term '/' Factor     {}
-      | Factor              {}
-
-Factor : Int                               {}
-       | Float                             {}
-       | Id                                {}
-       | '(' ExpressaoAritmetica ')'       {}      
+Factor : Int                               {Const (CInt $1)}
+       | Float                             {Const (CDouble $1)}
+       | '(' ExpressaoAritmetica ')'       {$2}      
 
 
 {
