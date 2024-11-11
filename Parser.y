@@ -49,6 +49,24 @@ import DataTree
 
 %%
 
+ExpressaoLogica: ExpressaoLogica '&&' LTermo       {And $1 $3}
+               | ExpressaoLogica '||' LTermo       {Or $1 $3}
+               | LTermo                                 {$1}
+
+LTermo : '!' LFator         {Not $2}
+       | LFator             {$1}
+
+LFator : '(' ExpressaoLogica ')'   {$2}
+       | ExpressaoRelacional       {Rel $1}
+
+ExpressaoRelacional : ExpressaoAritmetica '==' ExpressaoAritmetica {Req $1 $3}
+                    | ExpressaoAritmetica '>=' ExpressaoAritmetica {Rge $1 $3}
+                    | ExpressaoAritmetica '>' ExpressaoAritmetica  {Rgt $1 $3}
+                    | ExpressaoAritmetica '<' ExpressaoAritmetica  {Rlt $1 $3}
+                    | ExpressaoAritmetica '<=' ExpressaoAritmetica {Rle $1 $3}
+                    | ExpressaoAritmetica '/=' ExpressaoAritmetica {Rdif $1 $3}
+
+
 ExpressaoAritmetica: ExpressaoAritmetica '+' Term  {Add $1 $3}
                    | ExpressaoAritmetica '-' Term  {Sub $1 $3}
                    | Term {$1}
@@ -59,6 +77,7 @@ Term  : Term  '*' Factor    {Mul $1 $3}
 
 Factor : Int                               {Const (CInt $1)}
        | Float                             {Const (CDouble $1)}
+       | Id                                {IdVar $1}
        | '(' ExpressaoAritmetica ')'       {$2}      
 
 
