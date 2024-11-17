@@ -49,6 +49,21 @@ import DataTree
 
 %%
 
+
+
+Declaracoes: Declaracoes Declaracao {$1 ++ [$2]}
+           | Declaracao {[$1]}
+
+Declaracao : Tipo ListaId ';'      {map (\x -> x:#: ($1,0)) $2}
+
+Tipo: 'int'                 {TInt}
+    | 'string'              {TString} 
+    | 'float'               {TDouble}
+
+ListaId: ListaId ',' Id            {$1 ++ [$3]}
+       | Id                        {[$1]}
+
+
 Bloco: '{' ListaCmd '}'           {$2}
 
 
