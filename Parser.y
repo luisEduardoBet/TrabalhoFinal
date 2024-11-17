@@ -49,20 +49,35 @@ import DataTree
 
 %%
 
-Bloco: '{' ListaCmd '}'           {[$2]}
+Bloco: '{' ListaCmd '}'           {$2}
 
 
-ListaCmd: Comando    {$1}
+ListaCmd: ListaCmd Comando    {$1++[$2]}
+       | Comando {[$1]}     
 
 Comando: CmdSe  {$1}
+       | CmdEnquanto {$1}
+       | CmdAtrib {$1}
        | CmdEscrita {$1}
+       | CmdLeitura {$1}
 
-CmdSe: 'if' '(' ExpressaoLogica ')' Bloco                            {If $3 $5 $5}
+
+CmdSe: 'if' '(' ExpressaoLogica ')' Bloco                            {If $3 $5 []}
      | 'if'  '(' ExpressaoLogica ')' Bloco  'else'  Bloco            {If $3 $5 $7} 
 
 
+CmdEnquanto:  'while' '(' ExpressaoLogica ')' Bloco  {While $3 $5}
+
+
+CmdAtrib: Id '=' ExpressaoAritmetica ';'         {Atrib $1 $3}
+        | Id '=' Literal ';'                     {Atrib $1 (Lit $3)}
+
 
 CmdEscrita: 'print' '(' ExpressaoAritmetica ')' ';'     {Imp $3} 
+       |    'print' '(' Literal ')' ';'                 {Imp (Lit $3)}  
+
+CmdLeitura: 'read' '(' Id ')' ';'                {Leitura $3}
+
 
 
 ExpressaoLogica: ExpressaoLogica '&&' LTermo       {And $1 $3}
@@ -95,6 +110,8 @@ Factor : Int                               {Const (CInt $1)}
        | Float                             {Const (CDouble $1)}
        | Id                                {IdVar $1}
        | '(' ExpressaoAritmetica ')'       {$2}      
+
+
 
 
 {
