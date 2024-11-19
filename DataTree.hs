@@ -29,3 +29,6 @@ data Comando =
     | Ret (Maybe Expr)
     | Proc Id [Expr]
         deriving Show
+
+t1:: (Funcao, ([Var], Bloco)) -> (Id, [Var], Bloco) 
+t1 (a:->:as,(b,c)) = (a, (fst as) ++ b,c) 
