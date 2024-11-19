@@ -50,9 +50,24 @@ import DataTree
 %%
 
 
+Funcao : TipoRetorno Id '(' DeclParametros ')' BlocoPrincipal {($2:->:($4,$1), $6)}   
+       | TipoRetorno Id '(' ')' BlocoPrincipal {($2 :->:([],$1), $5)}                       
 
-Declaracoes: Declaracoes Declaracao {$1 ++ [$2]}
-           | Declaracao {[$1]}
+TipoRetorno: Tipo           {$1}
+           | 'void'         {TVoid}
+
+DeclParametros: DeclParametros ',' Parametro     {$1 ++ [$3]}
+              | Parametro                        {[$1]}
+
+Parametro:  Tipo Id         {$2:#:($1, 0)}
+
+
+BlocoPrincipal: '{' Declaracoes ListaCmd'}'      {($2, $3)}
+              | '{' ListaCmd '}'                 {([], $2)}
+
+
+Declaracoes: Declaracoes Declaracao {$1++$2}
+           | Declaracao {$1}
 
 Declaracao : Tipo ListaId ';'      {map (\x -> x:#: ($1,0)) $2}
 
