@@ -49,7 +49,8 @@ import DataTree
 
 %%
 
-Programa :  BlocoPrincipal  {Prog[] [] (fst $1) (snd $1)}
+Programa :  
+              BlocoPrincipal  {Prog[] [] (fst $1) (snd $1)}
 
 ListaFuncoes : ListaFuncoes Funcao        {$1 ++ [$2]}
              | Funcao                     {[$1]}
