@@ -48,7 +48,6 @@ import DataTree
   Id   {CID $$}
 
 %%
-
 Programa : ListaFuncoes BlocoPrincipal {Prog (map fst $1) (map t1 $1) (fst $2) (snd $2) }
        | BlocoPrincipal  {Prog[] [] (fst $1) (snd $1)}
 
@@ -95,6 +94,8 @@ Comando: CmdSe  {$1}
        | CmdAtrib {$1}
        | CmdEscrita {$1}
        | CmdLeitura {$1}
+       | ChamadaProc {$1}
+       | Retorno {$1}
 
 
 CmdSe: 'if' '(' ExpressaoLogica ')' Bloco                            {If $3 $5 []}
@@ -114,6 +115,21 @@ CmdEscrita: 'print' '(' ExpressaoAritmetica ')' ';'     {Imp $3}
 CmdLeitura: 'read' '(' Id ')' ';'                {Leitura $3}
 
 
+ChamadaProc: ChamadaFuncao ';'                   {Proc (fst $1) (snd $1)}
+
+ChamadaFuncao: Id '(' ListaParametros ')'        {($1,$3)}
+             | Id '(' ')'                        {($1,[])}
+
+
+ListaParametros: ListaParametros ',' ExpressaoAritmetica       {$1 ++ [$3]}
+               | ListaParametros ',' Literal                   {$1 ++ [Lit $3]} 
+               | Literal                                        {[(Lit $1)]} 
+               | ExpressaoAritmetica                            {[$1]}
+               
+
+Retorno: 'return' ExpressaoAritmetica ';'        {Ret (Just $2)}
+       | 'return' Literal ';'                    {Ret (Just (Lit $2))}
+       | 'return' ';'                            {Ret (Nothing)}
 
 ExpressaoLogica: ExpressaoLogica '&&' LTermo       {And $1 $3}
                | ExpressaoLogica '||' LTermo       {Or $1 $3}
@@ -144,10 +160,8 @@ Term  : Term  '*' Factor    {Mul $1 $3}
 Factor : Int                               {Const (CInt $1)}
        | Float                             {Const (CDouble $1)}
        | Id                                {IdVar $1}
+       | ChamadaFuncao                     {Chama (fst $1) (snd $1)}
        | '(' ExpressaoAritmetica ')'       {$2}      
-
-
-
 
 {
 parseError :: [Token] -> a
