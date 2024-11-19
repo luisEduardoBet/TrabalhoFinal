@@ -49,6 +49,10 @@ import DataTree
 
 %%
 
+Programa :  BlocoPrincipal  {Prog[] [] (fst $1) (snd $1)}
+
+ListaFuncoes : ListaFuncoes Funcao        {$1 ++ [$2]}
+             | Funcao                     {[$1]}
 
 Funcao : TipoRetorno Id '(' DeclParametros ')' BlocoPrincipal {($2:->:($4,$1), $6)}   
        | TipoRetorno Id '(' ')' BlocoPrincipal {($2 :->:([],$1), $5)}                       
