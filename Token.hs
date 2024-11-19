@@ -4,7 +4,7 @@ data Token
   = CFLOAT Double
   | CLITERAL String
   | CID String
-  | CINT Integer
+  | CINT Int
   | TADD
   | TSUB
   | TMUL
