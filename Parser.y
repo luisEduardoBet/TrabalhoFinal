@@ -5,6 +5,7 @@ import System.IO
 import Token
 import qualified Lex as L
 import DataTree
+
 }
 
 %name calc
@@ -149,9 +150,13 @@ ExpressaoRelacional : ExpressaoAritmetica '==' ExpressaoAritmetica {Req $1 $3}
                     | ExpressaoAritmetica '/=' ExpressaoAritmetica {Rdif $1 $3}
 
 
-ExpressaoAritmetica: ExpressaoAritmetica '+' Term  {Add $1 $3}
-                   | ExpressaoAritmetica '-' Term  {Sub $1 $3}
-                   | Term {$1}
+
+ExpressaoAritmetica: '-' ExpressaoAritmetica {Neg $2}
+                     | Expressao {$1}
+
+Expressao : Expressao '+' Term     {Add $1 $3}
+       | Expressao '-' Term        {Sub $1 $3}
+       | Term                      {$1}
 
 Term  : Term  '*' Factor    {Mul $1 $3}
       | Term '/' Factor     {Div $1 $3}
