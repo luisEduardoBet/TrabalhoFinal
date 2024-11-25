@@ -1025,10 +1025,9 @@ parseError :: [Token] -> a
 parseError s = error ("Parse error:" ++ show s)
 
 main = do
-       handle <- openFile "texto.txt" ReadMode
-       contents <- hGetContents handle
-       print(calc(L.alexScanTokens contents)) 
-       hClose handle
+       content <- readFile "texto.txt"
+       let parse = calc(L.alexScanTokens content)
+       writeFile "Parsed1.txt" (show $ parse )
 -- $Id: GenericTemplate.hs,v 1.26 2005/01/14 14:47:22 simonmar Exp $
 
 #if !defined(__GLASGOW_HASKELL__)
